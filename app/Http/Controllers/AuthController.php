@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+
+class AuthController extends Controller
+{
+    public function login()
+    {
+        return view('auth.login');
+    }
+    public function authenticated(Request $request)
+    {
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required'
+        ]);
+        $credentials = $request->only('username', 'password');
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
+            return redirect('/dashboard');
+        }
+        return back()->withErrors([
+            'loginError' => 'username atau password salah.',
+        ]);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+
+        return redirect('/login');
+    }
+}
